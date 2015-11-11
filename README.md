@@ -1,2 +1,2 @@
-# foams-automata
-Cellular automata simulating growth of foams.
+# forams-automata
+Cellular automata simulating growth of forams.

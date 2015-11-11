@@ -9,7 +9,7 @@
 
 -include("config.hrl").
 -include("algae.hrl").
--include("foam.hrl").
+-include("foram.hrl").
 
 %% API
 -export([init/1, insert/2, grow_all/1, reproduce_all/1]).
@@ -29,7 +29,7 @@ insert(Map, Algae = #algae{coords = Coords}) ->
         fun
             (#algae{}) ->
                 Algae;
-            (Old = #foam{}) ->
+            (Old = #foram{}) ->
                 Old
         end, Algae, Map).
 
@@ -43,8 +43,8 @@ grow_all(Map) ->
         end, Map, Map
     ).
 
-grow(Map, Foam = #algae{energy = Energy}) ->
-    insert(Map, Foam#algae{energy = Energy + ?ALGAE_GROWTH_RATE}).
+grow(Map, Foram = #algae{energy = Energy}) ->
+    insert(Map, Foram#algae{energy = Energy + ?ALGAE_GROWTH_RATE}).
 
 reproduce_all(Map) ->
     dict:fold(
@@ -92,7 +92,7 @@ is_valid_move(_, {_, Y}) when Y < 0 orelse Y >= ?WIDTH_PER_WORKER ->
     false;
 is_valid_move(Map, Coords)->
     case dict:find(Coords, Map) of
-        {ok, #foam{}} ->
+        {ok, #foram{}} ->
             false;
         {ok, #algae{}} ->
             false;

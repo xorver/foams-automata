@@ -13,7 +13,7 @@
 
 -include("config.hrl").
 -include("algae.hrl").
--include("foam.hrl").
+-include("foram.hrl").
 
 %% API
 -export([start_link/0]).
@@ -75,7 +75,7 @@ start_link() ->
 init([]) ->
     random:seed(time()),
     Map = dict:new(),
-    Map2 = foam:init(Map),
+    Map2 = foram:init(Map),
     Map3 = algae:init(Map2),
     {ok, #state{
         map = Map3
@@ -143,7 +143,7 @@ handle_info(confirmed, #state{master = Master, need_confirmation = 1} = State) -
     {noreply, State#state{need_confirmation = 0}};
 handle_info(confirmed, #state{need_confirmation = NeedConfirmation} = State) ->
     {noreply, State#state{need_confirmation = NeedConfirmation - 1}};
-handle_info({ReplyTo, #foam{}}, State) ->
+handle_info({ReplyTo, #foram{}}, State) ->
     ReplyTo ! confirmed,
     {noreply, State#state{}};
 handle_info(_Info, State) ->
@@ -185,10 +185,10 @@ code_change(_OldVsn, State, _Extra) ->
 
 step(ReplyTo, #state{map = Map, iteration = It} = State) ->
     map:dump(Map, It),
-    Map2 = foam:move_all(Map),
-    Map3 = foam:reproduce_all(Map2),
-    Map4 = foam:starve_all(Map3),
-    Map5 = foam:remove_dead(Map4),
+    Map2 = foram:move_all(Map),
+    Map3 = foram:reproduce_all(Map2),
+    Map4 = foram:starve_all(Map3),
+    Map5 = foram:remove_dead(Map4),
     Map6 = algae:grow_all(Map5),
     Map7 = algae:reproduce_all(Map6),
 

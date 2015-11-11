@@ -4,7 +4,7 @@
 %%% @doc
 %%% @end
 %%%--------------------------------------------------------------------
--module(foams_automata).
+-module(forams_automata).
 -author("Tomasz Lichon").
 
 -behaviour(application).
@@ -34,7 +34,7 @@
     {ok, pid(), State :: term()} |
     {error, Reason :: term()}).
 start(_StartType, _StartArgs) ->
-    case foams_automata_sup:start_link() of
+    case forams_automata_sup:start_link() of
         {ok, Pid} ->
             {ok, Pid};
         Error ->

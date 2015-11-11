@@ -4,7 +4,7 @@
 %%% @doc
 %%% @end
 %%%--------------------------------------------------------------------
--module(foams_automata_sup).
+-module(forams_automata_sup).
 -author("Tomasz Lichon").
 
 -behaviour(supervisor).

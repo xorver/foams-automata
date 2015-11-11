@@ -4,14 +4,14 @@
 %%% @doc
 %%% @end
 %%%--------------------------------------------------------------------
--ifndef(FOAM_HRL).
--define(FOAM_HRL, 1).
+-ifndef(FORAM_HRL).
+-define(FORAM_HRL, 1).
 
 -include("config.hrl").
 
--record(foam, {
+-record(foram, {
     coords :: {non_neg_integer(), non_neg_integer()},
-    energy = ?FOAM_INITIAL_ENERGY :: integer()
+    energy = ?FORAM_INITIAL_ENERGY :: integer()
 }).
 
 -endif.

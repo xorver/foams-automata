@@ -1,6 +1,6 @@
 @setlocal
 
-@set node_name=foams_automata
+@set node_name=forams_automata
 
 @rem Get the absolute path to the parent directory,
 @rem which is assumed to be the node root.

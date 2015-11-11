@@ -4,11 +4,11 @@
 %%% @doc
 %%% @end
 %%%--------------------------------------------------------------------
--module(foam).
+-module(foram).
 -author("Tomasz Lichon").
 
 -include("config.hrl").
--include("foam.hrl").
+-include("foram.hrl").
 -include("algae.hrl").
 
 %% API
@@ -19,73 +19,73 @@
 %%%===================================================================
 
 init(Map) ->
-    NumberOfFoams = round(?FOAM_INITIAL_GENERATION_SIZE *
+    NumberOfForams = round(?FORAM_INITIAL_GENERATION_SIZE *
         ?WIDTH_PER_WORKER * ?WIDTH_PER_WORKER),
-    RandomFoams = [random_foam() || _ <- lists:seq(1, NumberOfFoams)],
-    Foams = lists:usort(RandomFoams),
-    lists:foldl(fun(Foam, Dict) -> foam:insert(Dict, Foam) end, Map, Foams).
+    RandomForams = [random_foram() || _ <- lists:seq(1, NumberOfForams)],
+    Forams = lists:usort(RandomForams),
+    lists:foldl(fun(Foram, Dict) -> foram:insert(Dict, Foram) end, Map, Forams).
 
-insert(Map, Foam = #foam{coords = Coords, energy = Energy}) ->
+insert(Map, Foram = #foram{coords = Coords, energy = Energy}) ->
     dict:update(Coords,
         fun(#algae{energy = OldEnergy}) ->
-            Foam#foam{energy = OldEnergy + Energy}
-        end, Foam, Map).
+            Foram#foram{energy = OldEnergy + Energy}
+        end, Foram, Map).
 
 move_all(Map) ->
     dict:fold(
         fun
-            (_, #foam{} = V, D) ->
+            (_, #foram{} = V, D) ->
                 move(D, V);
             (_, _, D) ->
                 D
         end, Map, Map
     ).
 
-move(Map, Foam = #foam{coords = Coords}) ->
+move(Map, Foram = #foram{coords = Coords}) ->
     case random_valid_move(Map, Coords) of
         undefined ->
             Map;
         NewCoord ->
             Map2 = dict:erase(Coords, Map),
-            insert(Map2, Foam#foam{coords = NewCoord})
+            insert(Map2, Foram#foram{coords = NewCoord})
     end.
 
 reproduce_all(Map) ->
     dict:fold(
         fun
-            (_, V = #foam{energy = Energy}, D) when Energy >= ?FOAM_REPRODUCTION_LIMIT ->
+            (_, V = #foram{energy = Energy}, D) when Energy >= ?FORAM_REPRODUCTION_LIMIT ->
                 reproduce(D, V);
             (_, _, D) ->
                 D
         end, Map, Map
     ).
 
-reproduce(Map, Foam = #foam{coords = Coords, energy = Energy}) ->
+reproduce(Map, Foram = #foram{coords = Coords, energy = Energy}) ->
     case random_valid_move(Map, Coords) of
         undefined ->
             Map;
         NewCoord ->
-            Map2 = dict:store(Coords, Foam#foam{energy = Energy/2}, Map),
-            insert(Map2, Foam#foam{coords = NewCoord, energy = Energy/2})
+            Map2 = dict:store(Coords, Foram#foram{energy = Energy/2}, Map),
+            insert(Map2, Foram#foram{coords = NewCoord, energy = Energy/2})
     end.
 
 starve_all(Map) ->
     dict:fold(
         fun
-            (_, #foam{} = V, D) ->
+            (_, #foram{} = V, D) ->
                 starve(D, V);
             (_, _, D) ->
                 D
         end, Map, Map
     ).
 
-starve(Map, Foam = #foam{coords = Coords, energy = Energy}) ->
-    dict:store(Coords, Foam#foam{energy = Energy - ?FOAM_STARVATION_RATE}, Map).
+starve(Map, Foram = #foram{coords = Coords, energy = Energy}) ->
+    dict:store(Coords, Foram#foram{energy = Energy - ?FORAM_STARVATION_RATE}, Map).
 
 remove_dead(Map) ->
     dict:filter(
         fun
-            (_, #foam{energy = Energy}) when Energy =< 0 ->
+            (_, #foram{energy = Energy}) when Energy =< 0 ->
                 false;
             (_, _) ->
                 true
@@ -95,8 +95,8 @@ remove_dead(Map) ->
 %%% Internal functions
 %%%===================================================================
 
-random_foam() ->
-    #foam{coords = utils:random_coordinates(?WIDTH_PER_WORKER)}.
+random_foram() ->
+    #foram{coords = utils:random_coordinates(?WIDTH_PER_WORKER)}.
 
 random_valid_move(_, []) ->
     undefined;
@@ -118,7 +118,7 @@ is_valid_move(_, {_, Y}) when Y < 0 orelse Y >= ?WIDTH_PER_WORKER ->
     false;
 is_valid_move(Map, Coords)->
     case dict:find(Coords, Map) of
-        {ok, #foam{}} ->
+        {ok, #foram{}} ->
             false;
         _ ->
             true
