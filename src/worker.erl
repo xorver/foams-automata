@@ -11,6 +11,7 @@
 
 -behaviour(gen_server).
 
+-include("config.hrl").
 -include("algae.hrl").
 -include("foam.hrl").
 
@@ -117,10 +118,9 @@ handle_call(_Request, _From, State) ->
     {noreply, NewState :: #state{}} |
     {noreply, NewState :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
-handle_cast({step, ReplyTo}, #state{map = Map, iteration = It} = State) ->
-    map:dump(Map, It),
-    ReplyTo ! done,
-    {noreply, State#state{master = ReplyTo, iteration = It + 1}};
+handle_cast({step, ReplyTo},  State) ->
+    NewState = step(ReplyTo, State),
+    {noreply, NewState};
 handle_cast(_Request, State) ->
     {noreply, State}.
 
@@ -182,3 +182,15 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+step(ReplyTo, #state{map = Map, iteration = It} = State) ->
+    map:dump(Map, It),
+    Map2 = foam:move_all(Map),
+    Map3 = foam:reproduce_all(Map2),
+    Map4 = foam:starve_all(Map3),
+    Map5 = foam:remove_dead(Map4),
+    Map6 = algae:grow_all(Map5),
+    Map7 = algae:reproduce_all(Map6),
+
+    ReplyTo ! done,
+    State#state{iteration = It + 1, map = Map7}.
