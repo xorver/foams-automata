@@ -127,12 +127,11 @@ code_change(_OldVsn, State, _Extra) ->
 
 run() ->
     WorkersTabId = ets:new(workers, []),
-    ColorsTabId = ets:new(colors, [public]),
 
-    for(1, ?WORKERS_WIDTH, fun(Row) ->
-        for(1, ?WORKERS_WIDTH, fun(Column) ->
+    utils:for(1, ?WORKERS_WIDTH, fun(Row) ->
+        utils:for(1, ?WORKERS_WIDTH, fun(Column) ->
             io:format("Starting ~B ~B ~n", [Row, Column]),
-            {ok, Pid} = worker:start_link(ColorsTabId),
+            {ok, Pid} = worker:start_link(),
             ets:insert(WorkersTabId, {{Row, Column}, Pid})
         end)
     end),
@@ -153,7 +152,7 @@ run() ->
         {},
         WorkersTabId),
 
-    for(1, ?STEPS, fun(StepNum) ->
+    utils:for(1, ?STEPS, fun(StepNum) ->
         WorkersNum =
             ets:foldl(
                 fun({_, Pid}, Acc) ->
@@ -163,7 +162,7 @@ run() ->
                 0,
                 WorkersTabId),
 
-        for(1, WorkersNum, fun(_) -> receive done -> ok end end),
+        utils:for(1, WorkersNum, fun(_) -> receive done -> ok end end),
         io:format("Step ~B done~n", [StepNum])
     end).
 
@@ -173,7 +172,3 @@ find(TabId, Row, Column) ->
         [{_, Value}] -> Value
     end.
 
-for(I, N, _Fun) when I > N -> ok;
-for(I, N, Fun) ->
-    Fun(I),
-    for(I + 1, N, Fun).

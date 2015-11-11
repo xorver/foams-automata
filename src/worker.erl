@@ -11,8 +11,11 @@
 
 -behaviour(gen_server).
 
+-include("algae.hrl").
+-include("foam.hrl").
+
 %% API
--export([start_link/1]).
+-export([start_link/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -24,15 +27,9 @@
 
 -define(SERVER, ?MODULE).
 
--record(foam, {
-    coords :: {non_neg_integer(), non_neg_integer()},
-    energy :: integer()
-}).
-
 -record(state, {
-    colors_tid :: ets:tid(),
-    foams :: [#foam{}],
-    width :: non_neg_integer(),
+    iteration = 0,
+    map :: dict:dict(),
     left :: pid(),
     up :: pid(),
     right :: pid(),
@@ -51,10 +48,10 @@
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(start_link(term()) ->
+-spec(start_link() ->
    {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
-start_link(ColorsTabId) ->
-    gen_server:start_link(?MODULE, [ColorsTabId], []).
+start_link() ->
+    gen_server:start_link(?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -74,9 +71,13 @@ start_link(ColorsTabId) ->
 -spec(init(Args :: term()) ->
     {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
-init([ColorsTabId]) ->
+init([]) ->
+    random:seed(time()),
+    Map = dict:new(),
+    Map2 = foam:init(Map),
+    Map3 = algae:init(Map2),
     {ok, #state{
-        colors_tid = ColorsTabId
+        map = Map3
     }}.
 
 %%--------------------------------------------------------------------
@@ -116,9 +117,10 @@ handle_call(_Request, _From, State) ->
     {noreply, NewState :: #state{}} |
     {noreply, NewState :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
-handle_cast({step, ReplyTo}, State) ->
+handle_cast({step, ReplyTo}, #state{map = Map, iteration = It} = State) ->
+    map:dump(Map, It),
     ReplyTo ! done,
-    {noreply, State#state{master = ReplyTo}};
+    {noreply, State#state{master = ReplyTo, iteration = It + 1}};
 handle_cast(_Request, State) ->
     {noreply, State}.
 
@@ -141,9 +143,9 @@ handle_info(confirmed, #state{master = Master, need_confirmation = 1} = State) -
     {noreply, State#state{need_confirmation = 0}};
 handle_info(confirmed, #state{need_confirmation = NeedConfirmation} = State) ->
     {noreply, State#state{need_confirmation = NeedConfirmation - 1}};
-handle_info({ReplyTo, #foam{} = Foam}, State) ->
+handle_info({ReplyTo, #foam{}}, State) ->
     ReplyTo ! confirmed,
-    {noreply, State#state{foams = [Foam | State#state.foams]}};
+    {noreply, State#state{}};
 handle_info(_Info, State) ->
     {noreply, State}.
 
