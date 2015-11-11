@@ -1,0 +1,11 @@
+{application, foams_automata, [
+    {description, "Cellular automata simulating growth of foams."},
+    {vsn, "1"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib
+    ]},
+    {mod, {foams_automata, []}},
+    {env, []}
+]}.
