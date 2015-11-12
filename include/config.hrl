@@ -7,7 +7,7 @@
 -ifndef(CONFIG_HRL).
 -define(CONFIG_HRL, 1).
 
--define(PRINT_OUTPUT, true).
+-define(PRINT_OUTPUT, false).
 
 -define(WORKERS_WIDTH, 1).
 -define(WIDTH_PER_WORKER, 10).

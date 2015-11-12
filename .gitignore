@@ -12,3 +12,4 @@ rel/example_project
 .idea
 *.iml
 rel/forams_automata
+data/*.txt

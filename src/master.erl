@@ -12,7 +12,7 @@
 -include("config.hrl").
 
 %% API
--export([start_link/0, run/0]).
+-export([start_link/0, start/0]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
@@ -25,6 +25,9 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+start() ->
+    gen_server:call(master, run).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -67,7 +70,7 @@ init([]) ->
     {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
     {stop, Reason :: term(), NewState :: #state{}}.
 handle_call(run, _From, State) ->
-    master:run(),
+    run(),
     {reply, ok, State}.
 
 %%--------------------------------------------------------------------
