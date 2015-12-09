@@ -12,17 +12,13 @@
 -include("foram.hrl").
 
 %% API
--export([init/1, insert/2, grow_all/1, reproduce_all/1]).
+-export([init/1, insert/2, grow_all/1, reproduce_all/1, spawn_individuals/1]).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 init(Map) ->
-    NumberOfAlgaes = round(?ALGAE_INITIAL_GENERATION_SIZE *
-        ?WIDTH_PER_WORKER * ?WIDTH_PER_WORKER),
-    RandomAlgaes = [random_algae() || _ <- lists:seq(1, NumberOfAlgaes)],
-    Algaes = lists:usort(RandomAlgaes),
-    lists:foldl(fun(Algae, Dict) -> algae:insert(Dict, Algae) end, Map, Algaes).
+    spawn_individuals(Map, ?ALGAE_INITIAL_GENERATION_SIZE).
 
 insert(Map, Algae = #algae{coords = Coords}) ->
     dict:update(Coords,
@@ -65,9 +61,20 @@ reproduce(Map, Algae = #algae{coords = Coords, energy = Energy}) ->
             insert(Map2, Algae#algae{coords = NewCoord, energy = Energy/2})
     end.
 
+spawn_individuals(Map) ->
+    spawn_individuals(Map, ?ALGAE_SPAWN_SIZE).
+
+
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+spawn_individuals(Map, Num) ->
+    NumberOfAlgaes = round(Num *
+        ?WIDTH_PER_WORKER * ?WIDTH_PER_WORKER),
+    RandomAlgaes = [random_algae() || _ <- lists:seq(1, NumberOfAlgaes)],
+    Algaes = lists:usort(RandomAlgaes),
+    lists:foldl(fun(Algae, Dict) -> algae:insert(Dict, Algae) end, Map, Algaes).
 
 random_algae() ->
     #algae{coords = utils:random_coordinates(?WIDTH_PER_WORKER)}.

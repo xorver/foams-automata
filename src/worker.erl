@@ -50,7 +50,7 @@
 %% @end
 %%--------------------------------------------------------------------
 -spec(start_link() ->
-   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
+    {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link() ->
     gen_server:start_link(?MODULE, [], []).
 
@@ -89,7 +89,7 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
-    State :: #state{}) ->
+  State :: #state{}) ->
     {reply, Reply :: term(), NewState :: #state{}} |
     {reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
     {noreply, NewState :: #state{}} |
@@ -161,7 +161,7 @@ handle_info(_Info, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
-    State :: #state{}) -> term()).
+  State :: #state{}) -> term()).
 terminate(_Reason, _State) ->
     ok.
 
@@ -174,7 +174,7 @@ terminate(_Reason, _State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, State :: #state{},
-    Extra :: term()) ->
+  Extra :: term()) ->
     {ok, NewState :: #state{}} | {error, Reason :: term()}).
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
@@ -191,6 +191,7 @@ step(ReplyTo, #state{map = Map, iteration = It} = State) ->
     Map5 = foram:remove_dead(Map4),
     Map6 = algae:grow_all(Map5),
     Map7 = algae:reproduce_all(Map6),
+    Map8 = algae:spawn_individuals(Map7),
 
     ReplyTo ! done,
-    State#state{iteration = It + 1, map = Map7}.
+    State#state{iteration = It + 1, map = Map8}.

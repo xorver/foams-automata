@@ -165,8 +165,7 @@ run() ->
                 0,
                 WorkersTabId),
 
-        utils:for(1, WorkersNum, fun(_) -> receive done -> ok end end),
-        io:format("Step ~B done~n", [StepNum])
+        utils:for(1, WorkersNum, fun(_) -> receive done -> ok end end)
     end).
 
 find(TabId, Row, Column) ->

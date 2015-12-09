@@ -20,8 +20,8 @@
 dump(Map, Iteration) ->
     case ?PRINT_OUTPUT of
         true ->
-            Balance = get_balance(Map),
-            io:format(" ~p ", [Balance]);
+            {FN, AN} = get_balance(Map),
+            io:format("~p,~p,~p~n", [Iteration, FN, AN]);
         false ->
             dump_to_file(Map, Iteration)
     end.
